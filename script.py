@@ -18,6 +18,25 @@ def ldaLearn(X,y):
     # covmat - A single d x d learnt covariance matrix 
     
     # IMPLEMENT THIS METHOD 
+    
+    labels =[]
+    for val in y:
+        if val not in labels:
+            labels.append(val)
+    labels.sort()
+    means=np.zeros((X.shape[1],len(labels)))
+    k=len(labels)
+
+    all_means=[]
+    for i, label in enumerate(labels):
+        X_true=X[y==label]
+        mean=np.mean(X_true,axis=0)
+        all_means.append(mean.tolist())
+
+    means=np.array(all_means).T
+    mu=np.mean(X,axis=0)
+    x_i=X - mu
+    covmat=np.dot(x_i.T,x_i)/X.shape[0]
     return means,covmat
 
 def qdaLearn(X,y):
@@ -30,6 +49,25 @@ def qdaLearn(X,y):
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
     
     # IMPLEMENT THIS METHOD
+
+    labels =[]
+    for val in y:
+        if val not in labels:
+            labels.append(val)
+    labels.sort()
+    means=np.zeros((X.shape[1],len(labels)))
+    k=len(labels)
+
+    all_means=[]
+    for i, label in enumerate(labels):
+        X_true=X[y==label]
+        mean=np.mean(X_true,axis=0)
+        all_means.append(mean.tolist())
+        covariance=np.cov(X_true.T)
+        covmats.append(covariance)
+    means=np.array(all_means).T
+    
+
     return means,covmats
 
 def ldaTest(means,covmat,Xtest,ytest):
