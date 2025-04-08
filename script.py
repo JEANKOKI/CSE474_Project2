@@ -80,7 +80,14 @@ def learnRidgeRegression(X,y,lambd):
     # w = d x 1                                                                
 
     # IMPLEMENT THIS METHOD  
-    
+    d= X.shape[1]
+    lambda_identity= lambd*np.eye(d)
+    xTx= np.dot(np.transpose(X),X)
+    inv=np.linalg.inv(lambda_identity+xTx)
+    xTy=np.dot(np.transpose(X),y)
+    w=np.dot(inv, xTy)
+
+
 
     return w
 
@@ -109,7 +116,8 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
-    # IMPLEMENT THIS METHOD                                             
+    # IMPLEMENT THIS METHOD    
+                                             
     return error, error_grad
 
 def mapNonLinear(x,p):
