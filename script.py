@@ -101,7 +101,7 @@ def ldaTest(means,covmat,Xtest,ytest):
             values = -0.5 * np.dot(np.dot(diff.T, cov_inverser), diff)
             arr.append(values)
 
-        p_class = np.argmax(values) + 1 
+        p_class = np.argmax(arr) + 1 
         ypred.append(p_class)
 
     ypred = np.array(ypred).reshape(-1, 1)
