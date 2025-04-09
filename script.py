@@ -204,7 +204,9 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
-    # IMPLEMENT THIS METHOD    
+    # IMPLEMENT THIS METHOD
+
+
                                              
     return error, error_grad
 
@@ -216,6 +218,19 @@ def mapNonLinear(x,p):
     # Xp - (N x (p+1)) 
 	
     # IMPLEMENT THIS METHOD
+    x=x.flatten()
+    N=len(x)
+    
+    result =[] 
+    for i in range(N):
+      row= []
+      for exp in range(p+1):
+        row.append(x[i]**exp)
+      result.append(row)
+
+    Xp=np.array(result)
+      
+
     return Xp
 
 # Main script
@@ -261,7 +276,7 @@ plt.title('QDA')
 
 plt.show()
 
-"""
+
 # Problem 2
 if sys.version_info.major == 2:
     X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
