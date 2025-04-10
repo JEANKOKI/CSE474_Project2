@@ -116,18 +116,7 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
-    # IMPLEMENT THIS METHOD   
-
-    X_w= np.dot(X,w)
-
-
-    error = (0.5* (np.dot((y-X_w).T),(y-X_w)))+ (0.5* lambd * np.dot(np.transpose(w),w))
-
-    error_grad= -np.dot(X.T,(y-X_w)) + (lambd * w )
-    
-
-
-    
+    # IMPLEMENT THIS METHOD    
                                              
     return error, error_grad
 
@@ -281,3 +270,64 @@ plt.show()
 
 
 
+## this is for Question 3 video
+
+if sys.version_info.major == 2:
+    X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
+else:
+    X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'),encoding = 'latin1')
+
+# add intercept
+X_i = np.concatenate((np.ones((X.shape[0],1)), X), axis=1)
+Xtest_i = np.concatenate((np.ones((Xtest.shape[0],1)), Xtest), axis=1)
+
+w = learnOLERegression(X,y)
+mle = testOLERegression(w,Xtest,ytest)
+
+w_i = learnOLERegression(X_i,y)
+mle_i = testOLERegression(w_i,Xtest_i,ytest)
+
+print('MSE without intercept '+str(mle))
+print('MSE with intercept '+str(mle_i))
+
+#p3
+k = 101
+lambdas = np.linspace(0, 1, num=k)
+i = 0
+mses3_train = np.zeros((k,1))
+mses3 = np.zeros((k,1))
+for lambd in lambdas:
+    w_l = learnRidgeRegression(X_i,y,lambd)
+    mses3_train[i] = testOLERegression(w_l,X_i,y)
+    mses3[i] = testOLERegression(w_l,Xtest_i,ytest)
+    i = i + 1
+
+#best lambda finding
+best_lambda =lambdas[np.argmin(mses3)]
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(lambdas,mses3_train)
+plt.title('MSE for Train Data')
+plt.subplot(1, 2, 2)
+plt.plot(lambdas,mses3)
+plt.title('MSE for Test Data')
+
+
+plt.show()
+
+
+#plotting weights of OLE Ridge 
+w_optimal= learnRidgeRegression(X_i, y, best_lambda)
+
+ridge_norm= np.linalg.norm(w_optimal)
+ole_norm= np.linalg.norm(w_i)
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(w_i)
+plt.title('Weights for OLE')
+plt.subplot(1, 2, 2)
+plt.plot(w_optimal)
+plt.title('Weights for Ridge')
+print(f'Optimal λ = {best_lambda}')
