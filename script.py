@@ -18,6 +18,26 @@ def ldaLearn(X,y):
     # covmat - A single d x d learnt covariance matrix 
     
     # IMPLEMENT THIS METHOD 
+    y=y.flatten()
+    labels =[]
+    for val in y:
+        if val not in labels:
+            labels.append(val)
+    labels.sort()
+    means=np.zeros((X.shape[1],len(labels)))
+    k=len(labels)
+
+    all_means=[]
+    for i, label in enumerate(labels):
+        X_true=X[y==label]
+        mean=np.mean(X_true,axis=0)
+        all_means.append(mean.tolist())
+
+    means=np.array(all_means).T
+    mu=np.mean(X,axis=0)
+    x_i=X - mu
+    covmat=np.dot(x_i.T,x_i)/X.shape[0]
+
     return means,covmat
 
 def qdaLearn(X,y):
@@ -30,9 +50,31 @@ def qdaLearn(X,y):
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
     
     # IMPLEMENT THIS METHOD
+    y=y.flatten()
+    covmats=[]
+    labels =[]
+    for val in y:
+        if val not in labels:
+            labels.append(val)
+    labels.sort()
+    means=np.zeros((X.shape[1],len(labels)))
+    k=len(labels)
+
+    all_means=[]
+    for i, label in enumerate(labels):
+        X_true=X[y==label]
+        mean=np.mean(X_true,axis=0)
+        all_means.append(mean.tolist())
+        covariance=np.cov(X_true.T)
+        covmats.append(covariance)
+    means=np.array(all_means).T
+    
+
     return means,covmats
 
 def ldaTest(means,covmat,Xtest,ytest):
+
+    
     # Inputs
     # means, covmat - parameters of the LDA model
     # Xtest - a N x d matrix with each row corresponding to a test example
@@ -42,6 +84,30 @@ def ldaTest(means,covmat,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
+    ypred=[]
+    ytest=ytest.flatten()
+    cov_inverser=np.linalg.inv(covmat)
+    classes=means.shape[1]
+
+  
+
+    for x in Xtest:
+        arr = []
+
+        for i in range(classes):
+            mean_vectors = means[:, i]
+            diff = x - mean_vectors
+           
+            values = -0.5 * np.dot(np.dot(diff.T, cov_inverser), diff)
+            arr.append(values)
+
+        p_class = np.argmax(arr) + 1 
+        ypred.append(p_class)
+
+    ypred = np.array(ypred).reshape(-1, 1)
+    acc = np.mean(ypred.flatten() == ytest) * 100
+
+
     return acc,ypred
 
 def qdaTest(means,covmats,Xtest,ytest):
@@ -54,6 +120,28 @@ def qdaTest(means,covmats,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
+
+    ypred=[]
+    ytest=ytest.flatten()
+    cov_inverser=np.linalg.inv(covmats)
+    classes=means.shape[1]
+    
+    
+    for x in Xtest:
+      arr=[]
+      for i in range(classes):
+        mean_vectors=means[:,i]
+        sigma=covmats[i]
+        sigma_inverse=np.linalg.inv(sigma)
+        determinant=np.linalg.det(sigma)
+        z=x-mean_vectors
+        values=-.5*np.log(determinant) - 0.5 * np.dot(np.dot(z.T, sigma_inverse), z)
+        arr.append(values)
+
+      predict=np.argmax(arr)+1
+      ypred.append(predict)
+    ypred = np.array(ypred).reshape(-1, 1)
+    acc = np.mean(ypred.flatten() == ytest) * 100
     return acc,ypred
 
 def learnOLERegression(X,y):
@@ -116,6 +204,7 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
+
     # IMPLEMENT THIS METHOD   
     y=y.reshape(-1,1)
     w=w.reshape(-1,1)
@@ -128,7 +217,7 @@ def regressionObjVal(w, X, y, lambd):
     
 
 
-    
+
                                              
     return error, error_grad
 
@@ -140,6 +229,19 @@ def mapNonLinear(x,p):
     # Xp - (N x (p+1)) 
 	
     # IMPLEMENT THIS METHOD
+    x=x.flatten()
+    N=len(x)
+    
+    result =[] 
+    for i in range(N):
+      row= []
+      for exp in range(p+1):
+        row.append(x[i]**exp)
+      result.append(row)
+
+    Xp=np.array(result)
+      
+
     return Xp
 
 # Main script
@@ -184,6 +286,8 @@ plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
 plt.title('QDA')
 
 plt.show()
+
+
 # Problem 2
 if sys.version_info.major == 2:
     X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
@@ -280,6 +384,7 @@ plt.plot(range(pmax),mses5)
 plt.title('MSE for Test Data')
 plt.legend(('No Regularization','Regularization'))
 plt.show()
+
 
 
 
