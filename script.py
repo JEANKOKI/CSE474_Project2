@@ -215,7 +215,7 @@ def regressionObjVal(w, X, y, lambd):
 
     error = (0.5*np.dot((y-X_w).T,(y-  X_w))+0.5*lambd* np.dot(w.T , w) )
 
-    error_grad= -np.dot(X.T,(y-X_w)) + (lambd * w )
+    error_grad= (-np.dot(X.T,(y-X_w)) + (lambd * w )).flatten()
     
 
 
