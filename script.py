@@ -117,11 +117,12 @@ def regressionObjVal(w, X, y, lambd):
     # lambda                                                                  
 
     # IMPLEMENT THIS METHOD   
-
+    y=y.reshape(-1,1)
+    w=w.reshape(-1,1)
     X_w= np.dot(X,w)
 
 
-    error = (0.5* (np.dot((y-X_w).T),(y-X_w)))+ (0.5* lambd * np.dot(np.transpose(w),w))
+    error = (0.5*np.dot((y-X_w).T,(y-  X_w))+0.5*lambd* np.dot(w.T , w) )
 
     error_grad= -np.dot(X.T,(y-X_w)) + (lambd * w )
     
@@ -230,6 +231,7 @@ mses4_train = np.zeros((k,1))
 mses4 = np.zeros((k,1))
 opts = {'maxiter' : 20}    # Preferred value.                                                
 w_init = np.ones((X_i.shape[1],1))
+
 for lambd in lambdas:
     args = (X_i, y, lambd)
     w_l = minimize(regressionObjVal, w_init, jac=True, args=args,method='CG', options=opts)
