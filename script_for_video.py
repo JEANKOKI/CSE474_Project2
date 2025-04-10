@@ -18,26 +18,6 @@ def ldaLearn(X,y):
     # covmat - A single d x d learnt covariance matrix 
     
     # IMPLEMENT THIS METHOD 
-    y=y.flatten()
-    labels =[]
-    for val in y:
-        if val not in labels:
-            labels.append(val)
-    labels.sort()
-    means=np.zeros((X.shape[1],len(labels)))
-    k=len(labels)
-
-    all_means=[]
-    for i, label in enumerate(labels):
-        X_true=X[y==label]
-        mean=np.mean(X_true,axis=0)
-        all_means.append(mean.tolist())
-
-    means=np.array(all_means).T
-    mu=np.mean(X,axis=0)
-    x_i=X - mu
-    covmat=np.dot(x_i.T,x_i)/X.shape[0]
-
     return means,covmat
 
 def qdaLearn(X,y):
@@ -50,31 +30,9 @@ def qdaLearn(X,y):
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
     
     # IMPLEMENT THIS METHOD
-    y=y.flatten()
-    covmats=[]
-    labels =[]
-    for val in y:
-        if val not in labels:
-            labels.append(val)
-    labels.sort()
-    means=np.zeros((X.shape[1],len(labels)))
-    k=len(labels)
-
-    all_means=[]
-    for i, label in enumerate(labels):
-        X_true=X[y==label]
-        mean=np.mean(X_true,axis=0)
-        all_means.append(mean.tolist())
-        covariance=np.cov(X_true.T)
-        covmats.append(covariance)
-    means=np.array(all_means).T
-    
-
     return means,covmats
 
 def ldaTest(means,covmat,Xtest,ytest):
-
-    
     # Inputs
     # means, covmat - parameters of the LDA model
     # Xtest - a N x d matrix with each row corresponding to a test example
@@ -84,30 +42,6 @@ def ldaTest(means,covmat,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
-    ypred=[]
-    ytest=ytest.flatten()
-    cov_inverser=np.linalg.inv(covmat)
-    classes=means.shape[1]
-
-  
-
-    for x in Xtest:
-        arr = []
-
-        for i in range(classes):
-            mean_vectors = means[:, i]
-            diff = x - mean_vectors
-           
-            values = -0.5 * np.dot(np.dot(diff.T, cov_inverser), diff)
-            arr.append(values)
-
-        p_class = np.argmax(arr) + 1 
-        ypred.append(p_class)
-
-    ypred = np.array(ypred).reshape(-1, 1)
-    acc = np.mean(ypred.flatten() == ytest) * 100
-
-
     return acc,ypred
 
 def qdaTest(means,covmats,Xtest,ytest):
@@ -120,28 +54,6 @@ def qdaTest(means,covmats,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
-
-    ypred=[]
-    ytest=ytest.flatten()
-    cov_inverser=np.linalg.inv(covmats)
-    classes=means.shape[1]
-    
-    
-    for x in Xtest:
-      arr=[]
-      for i in range(classes):
-        mean_vectors=means[:,i]
-        sigma=covmats[i]
-        sigma_inverse=np.linalg.inv(sigma)
-        determinant=np.linalg.det(sigma)
-        z=x-mean_vectors
-        values=-.5*np.log(determinant) - 0.5 * np.dot(np.dot(z.T, sigma_inverse), z)
-        arr.append(values)
-
-      predict=np.argmax(arr)+1
-      ypred.append(predict)
-    ypred = np.array(ypred).reshape(-1, 1)
-    acc = np.mean(ypred.flatten() == ytest) * 100
     return acc,ypred
 
 def learnOLERegression(X,y):
@@ -204,20 +116,7 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
-
-    # IMPLEMENT THIS METHOD   
-    y=y.reshape(-1,1)
-    w=w.reshape(-1,1)
-    X_w= np.dot(X,w)
-
-
-    error = (0.5*np.dot((y-X_w).T,(y-  X_w))+0.5*lambd* np.dot(w.T , w) )
-
-    error_grad= -np.dot(X.T,(y-X_w)) + (lambd * w )
-    
-
-
-
+    # IMPLEMENT THIS METHOD    
                                              
     return error, error_grad
 
@@ -229,19 +128,6 @@ def mapNonLinear(x,p):
     # Xp - (N x (p+1)) 
 	
     # IMPLEMENT THIS METHOD
-    x=x.flatten()
-    N=len(x)
-    
-    result =[] 
-    for i in range(N):
-      row= []
-      for exp in range(p+1):
-        row.append(x[i]**exp)
-      result.append(row)
-
-    Xp=np.array(result)
-      
-
     return Xp
 
 # Main script
@@ -286,8 +172,6 @@ plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
 plt.title('QDA')
 
 plt.show()
-
-
 # Problem 2
 if sys.version_info.major == 2:
     X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
@@ -335,7 +219,6 @@ mses4_train = np.zeros((k,1))
 mses4 = np.zeros((k,1))
 opts = {'maxiter' : 20}    # Preferred value.                                                
 w_init = np.ones((X_i.shape[1],1))
-
 for lambd in lambdas:
     args = (X_i, y, lambd)
     w_l = minimize(regressionObjVal, w_init, jac=True, args=args,method='CG', options=opts)
@@ -387,4 +270,181 @@ plt.show()
 
 
 
+## this is for Question 3 video
 
+if sys.version_info.major == 2:
+    X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
+else:
+    X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'),encoding = 'latin1')
+
+# add intercept
+X_i = np.concatenate((np.ones((X.shape[0],1)), X), axis=1)
+Xtest_i = np.concatenate((np.ones((Xtest.shape[0],1)), Xtest), axis=1)
+
+w = learnOLERegression(X,y)
+mle = testOLERegression(w,Xtest,ytest)
+
+w_i = learnOLERegression(X_i,y)
+mle_i = testOLERegression(w_i,Xtest_i,ytest)
+
+print('MSE without intercept '+str(mle))
+print('MSE with intercept '+str(mle_i))
+
+#p3
+k = 101
+lambdas = np.linspace(0, 1, num=k)
+i = 0
+mses3_train = np.zeros((k,1))
+mses3 = np.zeros((k,1))
+for lambd in lambdas:
+    w_l = learnRidgeRegression(X_i,y,lambd)
+    mses3_train[i] = testOLERegression(w_l,X_i,y)
+    mses3[i] = testOLERegression(w_l,Xtest_i,ytest)
+    i = i + 1
+
+#best lambda finding
+best_lambda =lambdas[np.argmin(mses3)]
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(lambdas,mses3_train)
+plt.title('MSE for Train Data')
+plt.subplot(1, 2, 2)
+plt.plot(lambdas,mses3)
+plt.title('MSE for Test Data')
+
+
+plt.show()
+
+
+#plotting weights of OLE Ridge 
+w_optimal= learnRidgeRegression(X_i, y, best_lambda)
+
+ridge_norm= np.linalg.norm(w_optimal)
+ole_norm= np.linalg.norm(w_i)
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(w_i)
+plt.title('Weights for OLE')
+plt.subplot(1, 2, 2)
+plt.plot(w_optimal)
+plt.title('Weights for Ridge')
+print(f'Optimal λ = {best_lambda}')
+
+
+
+##FOR PROBLEM 4
+
+
+
+import numpy as np
+from scipy.optimize import minimize
+from scipy.io import loadmat
+from numpy.linalg import det, inv
+from math import sqrt, pi
+import scipy.io
+import matplotlib.pyplot as plt
+import pickle
+import sys
+def regressionObjVal(w, X, y, lambd):
+
+    # compute squared error (scalar) and gradient of squared error with respect
+    # to w (vector) for the given data X and y and the regularization parameter
+    # lambda                                                                  
+
+    # IMPLEMENT THIS METHOD   
+
+    X_w= np.dot(X,w)
+
+
+    error = (0.5 * np.dot((y - X_w).T, (y - X_w)) + 0.5 * lambd * np.dot(w.T, w))
+
+    error_grad= -np.dot(X.T,(y-X_w)) + (lambd * w )
+    
+
+
+    
+                                             
+    return error, error_grad
+
+
+
+
+      
+
+
+plt.show()
+# Problem 2
+if sys.version_info.major == 2:
+    X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
+else:
+    X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'),encoding = 'latin1')
+
+# add intercept
+X_i = np.concatenate((np.ones((X.shape[0],1)), X), axis=1)
+Xtest_i = np.concatenate((np.ones((Xtest.shape[0],1)), Xtest), axis=1)
+
+w = learnOLERegression(X,y)
+mle = testOLERegression(w,Xtest,ytest)
+
+w_i = learnOLERegression(X_i,y)
+mle_i = testOLERegression(w_i,Xtest_i,ytest)
+
+print('MSE without intercept '+str(mle))
+print('MSE with intercept '+str(mle_i))
+
+# Problem 3
+k = 101
+lambdas = np.linspace(0, 1, num=k)
+i = 0
+mses3_train = np.zeros((k,1))
+mses3 = np.zeros((k,1))
+for lambd in lambdas:
+    w_l = learnRidgeRegression(X_i,y,lambd)
+    mses3_train[i] = testOLERegression(w_l,X_i,y)
+    mses3[i] = testOLERegression(w_l,Xtest_i,ytest)
+    i = i + 1
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(lambdas,mses3_train)
+plt.title('MSE for Train Data')
+plt.subplot(1, 2, 2)
+plt.plot(lambdas,mses3)
+plt.title('MSE for Test Data')
+
+plt.show()
+# Problem 4
+
+k = 101
+lambdas = np.linspace(0, 1, num=k)
+i = 0
+mses4_train = np.zeros((k,1))
+mses4 = np.zeros((k,1))
+opts = {'maxiter' : 20}    # Preferred value.                                                
+w_init = np.ones((X_i.shape[1]))
+
+
+y=y.flatten()
+for lambd in lambdas:
+    args = (X_i, y, lambd)
+    
+    w_l = minimize(regressionObjVal, w_init, jac=True, args=args,method='CG', options=opts)
+    w_l = np.transpose(np.array(w_l.x))
+    w_l = np.reshape(w_l,[len(w_l),1])
+    mses4_train[i] = testOLERegression(w_l,X_i,y.reshape(-1,1))
+    mses4[i] = testOLERegression(w_l,Xtest_i,ytest)
+    i = i + 1
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(lambdas,mses4_train)
+plt.plot(lambdas,mses3_train)
+plt.title('MSE for Train Data')
+plt.legend(['Using scipy.minimize','Direct minimization'])
+
+plt.subplot(1, 2, 2)
+plt.plot(lambdas,mses4)
+plt.plot(lambdas,mses3)
+plt.title('MSE for Test Data')
+plt.legend(['Using scipy.minimize','Direct minimization'])
+plt.show()
