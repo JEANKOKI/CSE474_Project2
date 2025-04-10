@@ -48,7 +48,7 @@ def qdaLearn(X,y):
     # Outputs
     # means - A d x k matrix containing learnt means for each of the k classes
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
-    
+
     # IMPLEMENT THIS METHOD
     y=y.flatten()
     covmats=[]
@@ -65,13 +65,15 @@ def qdaLearn(X,y):
         X_true=X[y==label]
         mean=np.mean(X_true,axis=0)
         all_means.append(mean.tolist())
-        covariance=np.cov(X_true.T)
+
+        N = X_true.shape[0]
+        X_centered = X_true - mean
+        covariance = np.dot(X_centered.T, X_centered) / N  
         covmats.append(covariance)
     means=np.array(all_means).T
-    
+
 
     return means,covmats
-
 def ldaTest(means,covmat,Xtest,ytest):
 
     
